@@ -1,7 +1,7 @@
 const User = require("../../Database/Models/User");
 const Notification = require("../../Database/Models/Notifications");
 
- const follow = async (req, res) => {
+const follow = async (req, res) => {
   try {
     const { userId, currentUserId } = req.body;
 
@@ -53,9 +53,11 @@ const unfollow = async (req, res) => {
         userId: userId,
         body: "Someone followed you!",
       });
-
+    
       if (notificationToDelete) {
-        await notificationToDelete.remove();
+        await Notification.deleteOne({
+          _id: notificationToDelete._id,
+        });
       }
 
       let updatedFollowingIDS = [...(userFollow?.followingIds || [])];
@@ -63,7 +65,7 @@ const unfollow = async (req, res) => {
       updatedFollowingIDS = updatedFollowingIDS.filter(
         (i) => i != currentUserId
       );
-
+      console.log("updatedFollowingIDS=>", updatedFollowingIDS);
       const updatedUser = await User.findByIdAndUpdate(
         userId,
         { followingIds: updatedFollowingIDS },
