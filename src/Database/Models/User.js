@@ -21,12 +21,6 @@ const userSchema = new mongoose.Schema({
     { type: mongoose.Schema.Types.ObjectId, ref: "Notification" },
   ],
 });
-// Siempre antes del model
-// userSchema.pre("find", function () {
-//   this.populate("posts");
-//   // this.populate("comments");
-//   // this.populate("notifications");
-// });
 
 
 const User = mongoose.model("User", userSchema);
