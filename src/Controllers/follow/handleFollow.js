@@ -65,7 +65,7 @@ const unfollow = async (req, res) => {
       updatedFollowingIDS = updatedFollowingIDS.filter(
         (i) => i != currentUserId
       );
-      console.log("updatedFollowingIDS=>", updatedFollowingIDS);
+    
       const updatedUser = await User.findByIdAndUpdate(
         userId,
         { followingIds: updatedFollowingIDS },

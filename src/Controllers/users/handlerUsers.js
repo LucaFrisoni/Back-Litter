@@ -30,7 +30,7 @@ const getUserEmail = async (req, res) => {
   const userEmail = req.params.userEmail;
 
   try {
-    const user = await User.findOne({ email: userEmail });
+    const user = await User.findOne({ email: userEmail }).populate("posts");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
