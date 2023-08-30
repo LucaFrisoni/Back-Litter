@@ -5,11 +5,15 @@ const postSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
   body: String,
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  likeIds: [{ type: mongoose.Schema.Types.ObjectId }],
+  likeIds: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      timestamp: { type: Date, default: Date.now },
+    },
+  ],
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
 });
-
 
 // Siempre antes del model
 postSchema.pre("find", function () {

@@ -23,7 +23,7 @@ const makeLike = async (req, res) => {
 
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
-      { $push: { likeIds: currentUserId } },
+      { $push: { likeIds: { userId: currentUserId } } },
       { new: true }
     );
 
@@ -39,37 +39,32 @@ const deleteLike = async (req, res) => {
     const postId = req.query.postId;
     const currentUserId = req.query.currentUserId;
 
-    if (postId) {
-      const postLiked = await Post.findById(postId);
-
-      if (!postLiked) {
-        throw new Error("Invalid ID");
-      }
-
-      const notificationToDelete = await Notification.findOne({
-        userId: postLiked.userId,
-        body: "Someone liked your tweet!",
-      });
-
-      if (notificationToDelete) {
-        await notificationToDelete.remove();
-      }
-
-      let updatedLikeIDS = [...(postLiked?.likeIds || [])];
-
-      updatedLikeIDS = updatedLikeIDS.filter((i) => i != currentUserId);
-
-      const updatedPost = await Post.findByIdAndUpdate(
-        postId,
-        { likeIds: updatedLikeIDS },
-        { new: true }
-      );
-
-      res.status(200).json(updatedPost);
+    if (!postId || !currentUserId) {
+      return res.status(400).json({ error: "Missing postId or currentUserId" });
     }
+
+    const postLiked = await Post.findById(postId);
+
+    if (!postLiked) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const updatedLikeIds = postLiked.likeIds.filter(
+      (like) => like.userId.toString() !== currentUserId
+    );
+
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      { likeIds: updatedLikeIds },
+      { new: true }
+    );
+
+    // Remove notification logic goes here if needed
+
+    res.status(200).json(updatedPost);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: error });
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
