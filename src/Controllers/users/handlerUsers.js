@@ -11,7 +11,7 @@ const getUsers = async (req, res) => {
 const getUserId = async (req, res) => {
   const userId = req.params.userId;
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate("posts");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }

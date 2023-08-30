@@ -16,14 +16,14 @@ const postSchema = new mongoose.Schema({
 });
 
 // Siempre antes del model
-postSchema.pre("find", function () {
-  this.populate("user");
-  this.populate("comments");
-});
-postSchema.pre("findById", function () {
-  this.populate("user");
-  this.populate("comments");
-});
+// postSchema.pre("find", function () {
+//   this.populate("user");
+//   this.populate("comments");
+// });
+// postSchema.pre("findById", function () {
+//   this.populate("user");
+//   this.populate("comments");
+// });
 
 const Post = mongoose.model("Post", postSchema);
 

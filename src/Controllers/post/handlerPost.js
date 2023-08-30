@@ -36,9 +36,12 @@ const getPost = async (req, res) => {
       const user = await User.findById(userId);
 
       if (user) {
-        const posts = await Post.find({ userId: userId }).sort({
-          createdAt: "desc",
-        });
+        const posts = await Post.find({ userId: userId })
+          .sort({
+            createdAt: "desc",
+          })
+          .populate("user")
+          .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
         if (posts.length === 0) {
           res.status(200).json("They are not post available");
         }
@@ -46,7 +49,10 @@ const getPost = async (req, res) => {
         res.status(200).json(posts);
       }
     } else {
-      const posts = await Post.find().sort({ createdAt: "desc" });
+      const posts = await Post.find()
+        .sort({ createdAt: "desc" })
+        .populate("user")
+        .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
    if (posts.length === 0) {
      res.status(200).json("They are not post available");
    }
