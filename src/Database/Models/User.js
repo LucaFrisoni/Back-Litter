@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
+userSchema.pre("findById", function () {
+  this.populate("posts");
+});
+
 
 const User = mongoose.model("User", userSchema);
 
