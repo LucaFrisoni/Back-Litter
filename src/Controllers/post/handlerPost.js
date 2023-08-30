@@ -39,7 +39,7 @@ const getPost = async (req, res) => {
         const posts = await Post.find({ userId: userId }).sort({
           createdAt: "desc",
         });
-        if (!posts) {
+        if (posts.length === 0) {
           res.status(200).json("They are not post available");
         }
 
@@ -47,7 +47,7 @@ const getPost = async (req, res) => {
       }
     } else {
       const posts = await Post.find().sort({ createdAt: "desc" });
-   if (!posts) {
+   if (posts.length === 0) {
      res.status(200).json("They are not post available");
    }
       res.status(200).json(posts);
