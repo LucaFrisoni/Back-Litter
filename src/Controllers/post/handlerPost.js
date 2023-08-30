@@ -39,12 +39,17 @@ const getPost = async (req, res) => {
         const posts = await Post.find({ userId: userId }).sort({
           createdAt: "desc",
         });
+        if (!posts) {
+          res.status(200).json("They are not post available");
+        }
 
         res.status(200).json(posts);
       }
     } else {
       const posts = await Post.find().sort({ createdAt: "desc" });
-
+   if (!posts) {
+     res.status(200).json("They are not post available");
+   }
       res.status(200).json(posts);
     }
   } catch (error) {
@@ -64,7 +69,6 @@ const getPostId = async (req, res) => {
     const post = await Post.findById(postId)
       .populate("user")
       .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
-   
 
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
