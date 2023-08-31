@@ -20,6 +20,7 @@ const {
   getUserId,
   getUserEmail,
 } = require("../Controllers/users/handlerUsers");
+const handlerPasswordChange = require("../Controllers/password/handlerPasswordChange");
 
 router.post("/comments", makeComment);
 router.get("/comments", getComment);
@@ -39,6 +40,8 @@ router.get("/posts", getPost);
 router.get("/postss/:postId", getPostId);
 
 router.post("/register", userRegister);
+
+router.put("/passwordChange", handlerPasswordChange);
 
 router.get("/users", getUsers);
 router.get("/users/:userId", getUserId);
