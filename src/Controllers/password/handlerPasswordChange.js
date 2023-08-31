@@ -2,12 +2,12 @@ const User = require("../../Database/Models/User");
 const bcrypt = require("bcrypt");
 const handlerPasswordChange = async (req, res) => {
   const { email, password} = req.body;
-
+console.log("pass",password)
   try {
     const hashedPassword = await bcrypt.hash(password, 12);
     const updatedUser = await User.findOneAndUpdate(
       { email }, // Buscar por el email proporcionado
-      { password: hashedPassword }, // Actualizar los campos proporcionados
+      { hashedPassword: hashedPassword }, // Actualizar los campos proporcionados
       { new: true }
     );
     if (!updatedUser) {
