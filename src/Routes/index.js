@@ -21,7 +21,7 @@ const {
   getUserEmail,
 } = require("../Controllers/users/handlerUsers");
 const handlerPasswordChange = require("../Controllers/password/handlerPasswordChange");
-
+const { getCharts } = require("../Controllers/charts/handlerCharts");
 router.post("/comments", makeComment);
 router.get("/comments", getComment);
 
@@ -38,6 +38,8 @@ router.get("/notifications/:userId", getNotifications);
 router.post("/posts", tweetPost);
 router.get("/posts", getPost);
 router.get("/postss/:postId", getPostId);
+
+router.get("/charts", getCharts);
 
 router.post("/register", userRegister);
 
