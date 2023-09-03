@@ -169,9 +169,7 @@ const getCharts = async (req, res) => {
         const weekEnd = new Date(week.end);
         const weekLikes = filteredLikes.filter((like) => {
           const likeDate = new Date(like.timestamp);
-          console.log("LikeDate =>", likeDate.toDateString());
-          console.log("week start =>", weekStart);
-          console.log("week end =>", weekEnd);
+   
           return likeDate >= weekStart && likeDate <= weekEnd;
         }).length;
         values.push(weekLikes);
