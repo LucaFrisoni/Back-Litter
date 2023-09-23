@@ -89,6 +89,7 @@ const editUser = async (req, res) => {
             folder: "TwitterClone",
           }
         );
+        
         if (profileCloudinary.secure_url != lookSamePerson.profileImage) {
           updateFields.profileImage = profileCloudinary.secure_url;
         } else {
