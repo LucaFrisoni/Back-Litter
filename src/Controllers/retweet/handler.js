@@ -20,7 +20,8 @@ const retweetPost = async (req, res) => {
 
     await retweet.save();
 
-    post.retweets.push(retweet._id);
+    post.retweets.push(userRetweet);
+    await post.save();
 
     res.status(200).json(retweet);
   } catch (error) {
