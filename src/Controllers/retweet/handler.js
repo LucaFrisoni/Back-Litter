@@ -31,13 +31,15 @@ const retweetPost = async (req, res) => {
 };
 const deleteRetweet = async (req, res) => {
   const { postId, userRetweet } = req.query;
-
+console.log("Post id =>",postId)
+console.log("userRetweet =>", userRetweet);
   try {
     if (!postId) {
       throw new Error("Invalid ID");
     }
 
     const postRetweet = await Post.findById(postId);
+    console.log("postRetweet =>", postRetweet);
     if (!postRetweet) {
       return res.status(404).json({ error: "Post not found" });
     }
@@ -45,30 +47,23 @@ const deleteRetweet = async (req, res) => {
     const updatedRetweetIds = postRetweet.retweets.filter(
       (retweet) => retweet.toString() !== userRetweet
     );
-
+  console.log("updatedRetweetIds =>", updatedRetweetIds);
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
       { retweets: updatedRetweetIds },
       { new: true }
     );
-
+  console.log("updatedPost =>", updatedPost);
     // Remove notification logic goes here if needed
 
     if (!updatedPost) {
       res.status(400).json("Error updating post");
     }
-    const deleteRetweet = await Retweet.findByIdAndDelete({
+    const deleteRetweet = await Retweet.findOneAndDelete({
       postId,
-      userRetweet,
     });
-
-    if (deleteRetweet.deletedCount === 1) {
-      // El documento se eliminó exitosamente
-      res.status(200).json({ message: "Tweet Deleted" });
-    } else {
-      // No se encontró el documento con el ID proporcionado
-      res.status(404).json({ message: "Tweet not found" });
-    }
+  console.log("deleteRetweet =>", deleteRetweet);
+    res.status(200).json("Retweet Deleted")
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Error deleting post" });

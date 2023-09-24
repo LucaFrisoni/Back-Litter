@@ -88,7 +88,6 @@ const getPostId = async (req, res) => {
 };
 const deletePost = async (req, res) => {
   const {postId }= req.query;
-  console.log("postId", postId);
   try {
     if (!postId) {
       throw new Error("Invalid ID");
