@@ -23,30 +23,39 @@ const {
 } = require("../Controllers/users/handlerUsers");
 const handlerPasswordChange = require("../Controllers/password/handlerPasswordChange");
 const { getCharts } = require("../Controllers/charts/handlerCharts");
+const {
+  retweetPost,
+  deleteRetweet,
+} = require("../Controllers/retweet/handler");
+
+// Coments
 router.post("/comments", makeComment);
 router.get("/comments", getComment);
-
+// Edit
 router.patch("/edit", editUser);
-
+// Follow
 router.post("/follow", follow);
 router.delete("/follow", unfollow);
-
+// Like
 router.post("/like", makeLike);
 router.delete("/like", deleteLike);
-
+// Notification
 router.get("/notifications/:userId", getNotifications);
-
+// Posts
 router.post("/posts", tweetPost);
 router.get("/posts", getPost);
 router.delete("/delete/posts", deletePost);
 router.get("/postss/:postId", getPostId);
-
+// Retweets
+router.post("/retweets", retweetPost);
+router.delete("/retweets", deleteRetweet);
+// chart
 router.get("/charts", getCharts);
-
+// Register
 router.post("/register", userRegister);
-
+// PasswordChange
 router.put("/passwordChange", handlerPasswordChange);
-
+//Users
 router.get("/users", getUsers);
 router.get("/users/:userId", getUserId);
 router.get("/email/:userEmail", getUserEmail);

@@ -1,22 +1,21 @@
 const mongoose = require("mongoose");
 
-const postSchema = new mongoose.Schema({
+const retweetSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-  body: String,
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  postId: { type: mongoose.Schema.Types.ObjectId, ref: "Post" },
+//   Para el quote
   likeIds: [
     {
       userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
       timestamp: { type: Date, default: Date.now },
     },
   ],
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  userRetweet: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+//   Para el quote
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
-  retweets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Retweet" }],
 });
 
+const Retweet = mongoose.model("Retweet", retweetSchema);
 
-const Post = mongoose.model("Post", postSchema);
-
-module.exports = Post;
+module.exports = Retweet;
