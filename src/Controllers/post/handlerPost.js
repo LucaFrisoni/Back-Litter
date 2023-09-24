@@ -53,9 +53,9 @@ const getPost = async (req, res) => {
         .sort({ createdAt: "desc" })
         .populate("user")
         .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
-   if (posts.length === 0) {
-     res.status(200).json("They are not post available");
-   }
+      if (posts.length === 0) {
+        res.status(200).json("They are not post available");
+      }
       res.status(200).json(posts);
     }
   } catch (error) {
@@ -86,4 +86,26 @@ const getPostId = async (req, res) => {
     res.status(500).json({ error: "Error fetching post" });
   }
 };
-module.exports = { getPostId, tweetPost, getPost };
+const deletePost = async (req, res) => {
+  const {postId }= req.query;
+  console.log("postId", postId);
+  try {
+    if (!postId) {
+      throw new Error("Invalid ID");
+    }
+
+    const result = await Post.deleteOne({ _id: postId });
+
+    if (result.deletedCount === 1) {
+      // El documento se eliminó exitosamente
+      res.status(200).json({ message: "Tweet Deleted" });
+    } else {
+      // No se encontró el documento con el ID proporcionado
+      res.status(404).json({ message: "Tweet not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Error deleting post" });
+  }
+};
+module.exports = { getPostId, tweetPost, getPost, deletePost };

@@ -13,6 +13,7 @@ const {
   tweetPost,
   getPostId,
   getPost,
+  deletePost,
 } = require("../Controllers/post/handlerPost");
 const userRegister = require("../Controllers/register/handleRegister");
 const {
@@ -37,6 +38,7 @@ router.get("/notifications/:userId", getNotifications);
 
 router.post("/posts", tweetPost);
 router.get("/posts", getPost);
+router.delete("/delete/posts", deletePost);
 router.get("/postss/:postId", getPostId);
 
 router.get("/charts", getCharts);
