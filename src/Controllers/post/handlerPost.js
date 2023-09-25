@@ -107,7 +107,7 @@ const deletePost = async (req, res) => {
     }
 
     // Elimina todos los retweets que hacen referencia al post específico
-    await Retweet.deleteMany({ "postId._id": postId });
+    await Retweet.deleteMany({ postIdDelete: postId });
 
     // Elimina el post
     const result = await Post.deleteOne({ _id: postId });
