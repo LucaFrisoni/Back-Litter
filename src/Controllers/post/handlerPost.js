@@ -1,5 +1,6 @@
 const Post = require("../../Database/Models/Post");
 const User = require("../../Database/Models/User");
+const Retweet = require("../../Database/Models/Retweet");
 
 const tweetPost = async (req, res) => {
   try {
@@ -53,10 +54,22 @@ const getPost = async (req, res) => {
         .sort({ createdAt: "desc" })
         .populate("user")
         .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
-      if (posts.length === 0) {
-        res.status(200).json("They are not post available");
+
+      const retweets = await Retweet.find()
+        .sort({ createdAt: "desc" })
+        .populate("postId");
+
+      // Combina los arrays de posts y retweets en uno solo
+      const combinedPostsAndRetweets = [...posts, ...retweets];
+
+      // Ordena el array combinado en función del campo createdAt en orden descendente
+      combinedPostsAndRetweets.sort((a, b) => b.createdAt - a.createdAt);
+
+      if (combinedPostsAndRetweets.length === 0) {
+        res.status(200).json("No Posts available");
+      } else {
+        res.status(200).json(combinedPostsAndRetweets);
       }
-      res.status(200).json(posts);
     }
   } catch (error) {
     console.log(error);
@@ -87,23 +100,27 @@ const getPostId = async (req, res) => {
   }
 };
 const deletePost = async (req, res) => {
-  const {postId }= req.query;
+  const { postId } = req.query;
   try {
     if (!postId) {
       throw new Error("Invalid ID");
     }
 
+    // Elimina todos los retweets que hacen referencia al post específico
+    await Retweet.deleteMany({ "postId._id": postId });
+
+    // Elimina el post
     const result = await Post.deleteOne({ _id: postId });
 
     if (result.deletedCount === 1) {
       // El documento se eliminó exitosamente
-      res.status(200).json({ message: "Tweet Deleted" });
+      res.status(200).json({ message: "Tweet and its retweets deleted" });
     } else {
       // No se encontró el documento con el ID proporcionado
       res.status(404).json({ message: "Tweet not found" });
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ error: "Error deleting post" });
   }
 };

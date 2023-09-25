@@ -16,6 +16,7 @@ const retweetPost = async (req, res) => {
     const retweet = new Retweet({
       postId,
       userRetweet,
+      postIdDelete: postId,
     });
 
     await retweet.save();
@@ -31,15 +32,15 @@ const retweetPost = async (req, res) => {
 };
 const deleteRetweet = async (req, res) => {
   const { postId, userRetweet } = req.query;
-console.log("Post id =>",postId)
-console.log("userRetweet =>", userRetweet);
+  console.log("Post id =>", postId);
+  console.log("userRetweet =>", userRetweet);
   try {
     if (!postId) {
       throw new Error("Invalid ID");
     }
 
     const postRetweet = await Post.findById(postId);
-    console.log("postRetweet =>", postRetweet);
+
     if (!postRetweet) {
       return res.status(404).json({ error: "Post not found" });
     }
@@ -47,13 +48,13 @@ console.log("userRetweet =>", userRetweet);
     const updatedRetweetIds = postRetweet.retweets.filter(
       (retweet) => retweet.toString() !== userRetweet
     );
-  console.log("updatedRetweetIds =>", updatedRetweetIds);
+
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
       { retweets: updatedRetweetIds },
       { new: true }
     );
-  console.log("updatedPost =>", updatedPost);
+
     // Remove notification logic goes here if needed
 
     if (!updatedPost) {
@@ -62,8 +63,8 @@ console.log("userRetweet =>", userRetweet);
     const deleteRetweet = await Retweet.findOneAndDelete({
       postId,
     });
-  console.log("deleteRetweet =>", deleteRetweet);
-    res.status(200).json("Retweet Deleted")
+
+    res.status(200).json("Retweet Deleted");
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Error deleting post" });
