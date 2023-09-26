@@ -60,7 +60,8 @@ const getPost = async (req, res) => {
         .populate({
           path: "postId",
           populate: { path: "user" }, // Popula el campo 'user' dentro del objeto 'postId'
-        });
+        })
+        .populate("userRetweet");
 
       // Combina los arrays de posts y retweets en uno solo
       const combinedPostsAndRetweets = [...posts, ...retweets];
