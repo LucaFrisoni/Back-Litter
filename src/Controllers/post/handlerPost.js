@@ -49,17 +49,18 @@ const getPost = async (req, res) => {
         res.status(200).json(posts);
       }
     } else {
-      const posts = await Post.find()
-        .sort({ createdAt: "desc" })
-        .populate("user")
-        .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
+     const posts = await Post.find()
+       .sort({ createdAt: "desc" })
+       .populate("user")
+       .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
 
-      const x = posts.map((post) => {
-        if (post.rt.active === true) {
-          post.populate("userRetweet");
-        }
-      });
-      res.status(200).json(x);
+     for (const post of posts) {
+       if (post.rt.active === true) {
+         await post.populate("userRetweet");
+       }
+     }
+
+     res.status(200).json(posts);
     }
   } catch (error) {
     console.log(error);
