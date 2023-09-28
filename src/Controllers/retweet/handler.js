@@ -41,6 +41,8 @@ const deleteRetweet = async (req, res) => {
       (retweet) => retweet.toString() !== userRetweet
     );
 
+    postRetweet.rt.active = false;
+
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
       { retweets: updatedRetweetIds },
