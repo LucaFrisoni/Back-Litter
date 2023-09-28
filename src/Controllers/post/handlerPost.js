@@ -54,15 +54,25 @@ const getPost = async (req, res) => {
         .populate("user")
         .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
 
-      for (const post of posts) {
-        if (post.rt.active === true) {
-          await post.populate({
-            path: "rt.userRetweet", // Aquí especificamos la ruta completa
-          });
-        }
-      }
+      const retweets = await Retweet.find()
+        .sort({ createdAt: "desc" })
+        .populate({
+          path: "postId",
+          populate: { path: "user" }, // Popula el campo 'user' dentro del objeto 'postId'
+        })
+        .populate("userRetweet");
 
-      res.status(200).json(posts);
+      // Combina los arrays de posts y retweets en uno solo
+      const combinedPostsAndRetweets = [...posts, ...retweets];
+
+      // Ordena el array combinado en función del campo createdAt en orden descendente
+      combinedPostsAndRetweets.sort((a, b) => b.createdAt - a.createdAt);
+
+      if (combinedPostsAndRetweets.length === 0) {
+        res.status(200).json("No Posts available");
+      } else {
+        res.status(200).json(combinedPostsAndRetweets);
+      }
     }
   } catch (error) {
     console.log(error);
