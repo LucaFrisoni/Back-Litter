@@ -1,6 +1,6 @@
 const Post = require("../../Database/Models/Post");
 const User = require("../../Database/Models/User");
-
+const Retweet = require("../../Database/Models/Retweet")
 const tweetPost = async (req, res) => {
   try {
     const { email, body } = req.body;
