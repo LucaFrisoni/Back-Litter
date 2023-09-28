@@ -1,5 +1,4 @@
 const Post = require("../../Database/Models/Post");
-const Retweet = require("../../Database/Models/Retweet");
 
 const retweetPost = async (req, res) => {
   const { postId, userRetweet } = req.body;
@@ -13,14 +12,8 @@ const retweetPost = async (req, res) => {
     if (!post) {
       return res.status(400).json("Post doesnot exist");
     }
-    const retweet = new Retweet({
-      postId,
-      userRetweet,
-      postIdDelete: postId,
-    });
 
-    await retweet.save();
-
+    post.rt.active = true;
     post.retweets.push(userRetweet);
     await post.save();
 
@@ -32,8 +25,7 @@ const retweetPost = async (req, res) => {
 };
 const deleteRetweet = async (req, res) => {
   const { postId, userRetweet } = req.query;
-  console.log("Post id =>", postId);
-  console.log("userRetweet =>", userRetweet);
+
   try {
     if (!postId) {
       throw new Error("Invalid ID");
@@ -60,9 +52,6 @@ const deleteRetweet = async (req, res) => {
     if (!updatedPost) {
       res.status(400).json("Error updating post");
     }
-    const deleteRetweet = await Retweet.findOneAndDelete({
-      postId,
-    });
 
     res.status(200).json("Retweet Deleted");
   } catch (error) {
