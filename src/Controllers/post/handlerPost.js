@@ -55,21 +55,8 @@ const getPost = async (req, res) => {
         .populate("user")
         .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
 
-      const postet = await Promise.all(
-        posts.map(async (post) => {
-          if (post.rt.active === true) {
-            await post
-              .populate({
-                path: "rt",
-                populate: { path: "userRetweet" },
-              })
-              .execPopulate();
-          }
-          return post;
-        })
-      );
 
-      res.status(200).json(postet);
+      res.status(200).json(posts);
     }
   } catch (error) {
     console.log(error);
