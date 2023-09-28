@@ -1,7 +1,6 @@
 const Post = require("../../Database/Models/Post");
 const User = require("../../Database/Models/User");
 
-
 const tweetPost = async (req, res) => {
   try {
     const { email, body } = req.body;
@@ -55,8 +54,12 @@ const getPost = async (req, res) => {
         .populate("user")
         .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
 
-
-      res.status(200).json(posts);
+      const x = posts.map((post) => {
+        if (post.rt.active === true) {
+          post.populate("userRetweet");
+        }
+      });
+      res.status(200).json(x);
     }
   } catch (error) {
     console.log(error);
