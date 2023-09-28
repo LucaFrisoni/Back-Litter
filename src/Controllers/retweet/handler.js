@@ -14,6 +14,7 @@ const retweetPost = async (req, res) => {
     }
 
     post.rt.active = true;
+    post.rt.userRetweet = userRetweet;
     post.retweets.push(userRetweet);
     await post.save();
 
