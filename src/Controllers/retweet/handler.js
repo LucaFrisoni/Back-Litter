@@ -32,8 +32,7 @@ const retweetPost = async (req, res) => {
 };
 const deleteRetweet = async (req, res) => {
   const { postId, userRetweet } = req.query;
-  console.log("Post id =>", postId);
-  console.log("userRetweet =>", userRetweet);
+
   try {
     if (!postId) {
       throw new Error("Invalid ID");
@@ -62,6 +61,7 @@ const deleteRetweet = async (req, res) => {
     }
     const deleteRetweet = await Retweet.findOneAndDelete({
       postId,
+      userRetweet,
     });
 
     res.status(200).json("Retweet Deleted");
