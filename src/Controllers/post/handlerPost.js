@@ -1,6 +1,6 @@
 const Post = require("../../Database/Models/Post");
 const User = require("../../Database/Models/User");
-const Retweet = require("../../Database/Models/Retweet")
+const Retweet = require("../../Database/Models/Retweet");
 const tweetPost = async (req, res) => {
   try {
     const { email, body } = req.body;
@@ -42,11 +42,25 @@ const getPost = async (req, res) => {
           })
           .populate("user")
           .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
-        if (posts.length === 0) {
-          res.status(200).json("They are not post available");
-        }
 
-        res.status(200).json(posts);
+        const retweets = await Retweet.find({ userRetweet: userId })
+          .sort({ createdAt: "desc" })
+          .populate({
+            path: "postId",
+            populate: { path: "user" }, // Popula el campo 'user' dentro del objeto 'postId'
+          })
+          .populate("userRetweet");
+
+        const combinedPostsAndRetweets = [...posts, ...retweets];
+
+        // Ordena el array combinado en función del campo createdAt en orden descendente
+        combinedPostsAndRetweets.sort((a, b) => b.createdAt - a.createdAt);
+
+        if (combinedPostsAndRetweets.length === 0) {
+          res.status(200).json("No Posts available");
+        } else {
+          res.status(200).json(combinedPostsAndRetweets);
+        }
       }
     } else {
       const posts = await Post.find()
