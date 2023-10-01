@@ -59,10 +59,10 @@ const deleteRetweet = async (req, res) => {
     if (!updatedPost) {
       res.status(400).json("Error updating post");
     }
-    const deleteRetweet = await Retweet.findOneAndDelete({
-      postId,
-      userRetweet,
-    });
+   const deleteRetweet = await Retweet.deleteOne({
+     postId: postId,
+     userRetweet: userRetweet,
+   });
 
     res.status(200).json("Retweet Deleted");
   } catch (error) {
