@@ -27,6 +27,7 @@ const {
   retweetPost,
   deleteRetweet,
 } = require("../Controllers/retweet/handler");
+const { createQuote, deleteQuote } = require("../Controllers/quote/handler");
 
 // Coments
 router.post("/comments", makeComment);
@@ -49,6 +50,9 @@ router.get("/postss/:postId", getPostId);
 // Retweets
 router.post("/retweets", retweetPost);
 router.delete("/retweets", deleteRetweet);
+// Quotes
+router.post("/quotes", createQuote);
+router.delete("/quotes", deleteQuote);
 // chart
 router.get("/charts", getCharts);
 // Register

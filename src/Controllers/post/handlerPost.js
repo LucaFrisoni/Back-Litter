@@ -1,6 +1,10 @@
 const Post = require("../../Database/Models/Post");
 const User = require("../../Database/Models/User");
 const Retweet = require("../../Database/Models/Retweet");
+const Quote = require("../../Database/Models/Quote");
+
+
+
 const tweetPost = async (req, res) => {
   try {
     const { email, body } = req.body;
@@ -127,6 +131,19 @@ const deletePost = async (req, res) => {
     await Retweet.deleteMany({ postIdDelete: postId });
 
     // Elimina el post
+
+    const postUser = await Post.findById(postId).populate("user");
+
+    const updatedUserPostIds = postUser.user.posts.filter(
+      (post) => post.toString() !== postId.toString()
+    );
+
+    const updatedUser = await User.findByIdAndUpdate(
+      { _id: postUser.user._id },
+      { posts: updatedUserPostIds },
+      { new: true }
+    );
+
     const result = await Post.deleteOne({ _id: postId });
 
     if (result.deletedCount === 1) {
