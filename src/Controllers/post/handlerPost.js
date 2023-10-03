@@ -3,8 +3,6 @@ const User = require("../../Database/Models/User");
 const Retweet = require("../../Database/Models/Retweet");
 const Quote = require("../../Database/Models/Quote");
 
-
-
 const tweetPost = async (req, res) => {
   try {
     const { email, body } = req.body;
@@ -80,8 +78,13 @@ const getPost = async (req, res) => {
         })
         .populate("userRetweet");
 
+      const quotes = await Quote.find()
+        .sort({ createdAt: "desc" })
+        .populate({ path: "postId", populate: { path: "user" } })
+        .populate("userQuote");
+
       // Combina los arrays de posts y retweets en uno solo
-      const combinedPostsAndRetweets = [...posts, ...retweets];
+      const combinedPostsAndRetweets = [...posts, ...retweets, ...quotes];
 
       // Ordena el array combinado en función del campo createdAt en orden descendente
       combinedPostsAndRetweets.sort((a, b) => b.createdAt - a.createdAt);

@@ -30,11 +30,11 @@ const createQuote = async (req, res) => {
   }
 };
 const deleteQuote = async (req, res) => {
-  const { id } = req.query;
+  const { quoteId } = req.query;
 
   try {
-    const deleteQuote = await Retweet.deleteOne({
-      _id: id,
+    const deleteQuote = await Quote.deleteOne({
+      _id: quoteId,
     });
 
     res.status(200).json("Quote Deleted");
