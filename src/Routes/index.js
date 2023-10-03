@@ -7,7 +7,12 @@ const {
 } = require("../Controllers/comments/handlerComments");
 const editUser = require("../Controllers/edit/handlerEdit");
 const { follow, unfollow } = require("../Controllers/follow/handleFollow");
-const { makeLike, deleteLike } = require("../Controllers/like/handlerLike");
+const {
+  makeLike,
+  deleteLike,
+  makeLikeQuote,
+  deleteLikeQuote,
+} = require("../Controllers/like/handlerLike");
 const getNotifications = require("../Controllers/notifications/handlerNotifications");
 const {
   tweetPost,
@@ -40,6 +45,8 @@ router.delete("/follow", unfollow);
 // Like
 router.post("/like", makeLike);
 router.delete("/like", deleteLike);
+router.post("/likeQuote", makeLikeQuote);
+router.delete("/likeQuote", deleteLikeQuote);
 // Notification
 router.get("/notifications/:userId", getNotifications);
 // Posts
