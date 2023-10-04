@@ -117,11 +117,15 @@ const getPostId = async (req, res) => {
       .populate("user")
       .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
 
-    if (!post) {
-      return res.status(404).json({ error: "Post not found" });
+    const quote = await Quote.findById(postId)
+      .populate({ path: "postId", populate: { path: "user" } })
+      .populate("userQuote");
+
+    if (!post || !quote) {
+      return res.status(404).json({ error: "Post and Quote not found" });
     }
 
-    res.status(200).json(post);
+    res.status(200).json(post || quote);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Error fetching post" });
