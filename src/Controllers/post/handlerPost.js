@@ -124,8 +124,8 @@ const getPostId = async (req, res) => {
     if (!post && !quote) {
       return res.status(404).json({ error: "Post and Quote not found" });
     }
-
-    res.status(200).json(post || quote);
+    const result = post ? post : quote;
+    res.status(200).json(result);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Error fetching post" });
