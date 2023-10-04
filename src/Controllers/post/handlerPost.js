@@ -119,7 +119,8 @@ const getPostId = async (req, res) => {
 
     const quote = await Quote.findById(postId)
       .populate({ path: "postId", populate: { path: "user" } })
-      .populate("userQuote");
+      .populate("userQuote")
+      .populate("comments");
 
     if (!post && !quote) {
       return res.status(404).json({ error: "Post and Quote not found" });
