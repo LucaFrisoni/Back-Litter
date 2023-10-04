@@ -53,7 +53,7 @@ const getPost = async (req, res) => {
           })
           .populate("userRetweet");
 
-        const quotes = await Quote.find()
+        const quotes = await Quote.find({ userQuote: userId })
           .sort({ createdAt: "desc" })
           .populate({ path: "postId", populate: { path: "user" } })
           .populate("userQuote");
