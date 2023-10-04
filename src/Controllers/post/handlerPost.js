@@ -2,6 +2,7 @@ const Post = require("../../Database/Models/Post");
 const User = require("../../Database/Models/User");
 const Retweet = require("../../Database/Models/Retweet");
 const Quote = require("../../Database/Models/Quote");
+const QuoteRetweet = require("../../Database/Models/QuoteRetweet");
 
 const tweetPost = async (req, res) => {
   try {
@@ -87,7 +88,7 @@ const getPost = async (req, res) => {
         .populate({ path: "postId", populate: { path: "user" } })
         .populate("userQuote");
 
-      const quoteretweets = await Retweet.find()
+      const quoteretweets = await QuoteRetweet.find()
         .sort({ createdAt: "desc" })
         .populate({
           path: "quoteId",
