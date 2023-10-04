@@ -1,6 +1,7 @@
 const Post = require("../../Database/Models/Post");
 const Retweet = require("../../Database/Models/Retweet");
 const Quote = require("../../Database/Models/Quote");
+const QuoteRetweet = require("../../Database/Models/QuoteRetweet");
 
 const createQuote = async (req, res) => {
   const { postId, userQuote, body } = req.body;
@@ -33,6 +34,11 @@ const deleteQuote = async (req, res) => {
   const { quoteId } = req.query;
 
   try {
+    if (!quoteId) {
+      throw new Error("Invalid ID");
+    }
+    await QuoteRetweet.deleteMany({ quoteIdDelete: quoteId });
+
     const deleteQuote = await Quote.deleteOne({
       _id: quoteId,
     });

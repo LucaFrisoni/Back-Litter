@@ -105,14 +105,14 @@ const retweetQuote = async (req, res) => {
 };
 
 const deleteRetweetQuote = async (req, res) => {
-  const { postId, userQuoteRetweet } = req.query;
+  const { quoteId, userQuoteRetweet } = req.query;
 
   try {
-    if (!postId) {
+    if (!quoteId) {
       throw new Error("Invalid ID");
     }
 
-    const quoteRetweet = await Quote.findById(postId);
+    const quoteRetweet = await Quote.findById(quoteId);
     if (!quoteRetweet) {
       return res.status(404).json({ error: "Quote not found" });
     }
@@ -122,7 +122,7 @@ const deleteRetweetQuote = async (req, res) => {
     );
 
     const updatedQuote = await Quote.findByIdAndUpdate(
-      postId,
+      quoteId,
       { retweets: updatedRetweetIds },
       { new: true }
     );
@@ -133,7 +133,7 @@ const deleteRetweetQuote = async (req, res) => {
       res.status(400).json("Error updating Quote");
     }
     const deleteRetweet = await QuoteRetweet.deleteOne({
-      postId: postId,
+      quoteId,
       userQuoteRetweet: userQuoteRetweet,
     });
 

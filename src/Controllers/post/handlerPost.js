@@ -152,6 +152,7 @@ const getPostId = async (req, res) => {
     res.status(500).json({ error: "Error fetching post" });
   }
 };
+
 const deletePost = async (req, res) => {
   const { postId } = req.query;
   try {
@@ -190,4 +191,5 @@ const deletePost = async (req, res) => {
     res.status(500).json({ error: "Error deleting post" });
   }
 };
+
 module.exports = { getPostId, tweetPost, getPost, deletePost };

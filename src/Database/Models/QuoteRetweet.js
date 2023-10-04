@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const quoteretweetSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+  quoteIdDelete: String,
   quoteId: { type: mongoose.Schema.Types.ObjectId, ref: "Quote" },
   userQuoteRetweet: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
