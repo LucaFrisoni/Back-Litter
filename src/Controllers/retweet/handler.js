@@ -87,7 +87,7 @@ const retweetQuote = async (req, res) => {
       return res.status(400).json("Quote doesnot exist");
     }
     const retweet = new QuoteRetweet({
-      postId,
+      quoteId:postId,
       userQuoteRetweet,
       quoteIdDelete: postId,
     });
