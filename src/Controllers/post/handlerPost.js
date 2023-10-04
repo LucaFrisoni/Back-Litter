@@ -121,7 +121,7 @@ const getPostId = async (req, res) => {
       .populate({ path: "postId", populate: { path: "user" } })
       .populate("userQuote");
 
-    if (!post || !quote) {
+    if (!post && !quote) {
       return res.status(404).json({ error: "Post and Quote not found" });
     }
 

@@ -2,39 +2,48 @@ const User = require("../../Database/Models/User");
 const Notification = require("../../Database/Models/Notifications");
 const Post = require("../../Database/Models/Post");
 const Comment = require("../../Database/Models/Comments");
+const Quote = require("../../Database/Models/Quote");
 
 const makeComment = async (req, res) => {
   try {
-     const { currentUserId, body, postId } = req.body;
+    const { currentUserId, body, postId } = req.body;
 
-     const newComment = new Comment({
-       body,
-       postId,
-       userId: currentUserId,
-     });
+    const newComment = new Comment({
+      body,
+      postId,
+      userId: currentUserId,
+    });
+    let quoteCommented = null;
+    const postCommented = await Post.findById(postId);
+    if (!postCommented) {
+      quoteCommented = await Quote.findById(postId);
+    }
+    //  if (postCommented) {
+    //    await Notification.create({
+    //      body: "Someone commented on your post!",
+    //      userId: postCommented.userId,
+    //    });
 
-     const postCommented = await Post.findById(postId);
+    //    if (postCommented.userId) {
+    //      await User.findByIdAndUpdate(postCommented.userId, {
+    //        hasNotification: true,
+    //      });
+    //    }
+    //  }
 
-     if (postCommented) {
-       await Notification.create({
-         body: "Someone commented on your post!",
-         userId: postCommented.userId,
-       });
+    await newComment.save();
 
-       if (postCommented.userId) {
-         await User.findByIdAndUpdate(postCommented.userId, {
-           hasNotification: true,
-         });
-       }
-     }
+    // Agregar el _id del comentario al array de comentarios del post
+    if (postCommented) {
+      postCommented.comments.push(newComment._id);
+      await postCommented.save();
+    }
+    if (quoteCommented) {
+      quoteCommented.comments.push(newComment._id);
+      await quoteCommented.save();
+    }
 
-     await newComment.save();
-
-     // Agregar el _id del comentario al array de comentarios del post
-     postCommented.comments.push(newComment._id);
-     await postCommented.save();
-
-     res.status(200).json(newComment);
+    res.status(200).json(newComment);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Error creating comment" });
