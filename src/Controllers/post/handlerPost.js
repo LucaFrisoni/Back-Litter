@@ -87,8 +87,27 @@ const getPost = async (req, res) => {
         .populate({ path: "postId", populate: { path: "user" } })
         .populate("userQuote");
 
+      const quoteretweets = await Retweet.find()
+        .sort({ createdAt: "desc" })
+        .populate({
+          path: "quoteId",
+          populate: [
+            {
+              path: "postId",
+              populate: { path: "user" },
+            },
+            { path: "userQuote" }, // Agregar este populate para userQuote en Quote
+          ],
+        })
+        .populate("userQuoteRetweet");
+
       // Combina los arrays de posts y retweets en uno solo
-      const combinedPostsAndRetweets = [...posts, ...retweets, ...quotes];
+      const combinedPostsAndRetweets = [
+        ...posts,
+        ...retweets,
+        ...quotes,
+        ...quoteretweets,
+      ];
 
       // Ordena el array combinado en función del campo createdAt en orden descendente
       combinedPostsAndRetweets.sort((a, b) => b.createdAt - a.createdAt);
