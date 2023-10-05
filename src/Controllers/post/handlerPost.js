@@ -174,18 +174,37 @@ const getPostId = async (req, res) => {
 };
 
 const deletePost = async (req, res) => {
-  const { postId } = req.query;
+  const { postId, commentId } = req.query;
   try {
     if (!postId) {
       throw new Error("Invalid ID");
+    }
+
+    const postUser = await Post.findById(postId)
+      .populate("user")
+      .populate("Comment");
+
+    if (!postUser) {
+      return res.status(404).json({ message: "Tweet not found" });
+    }
+
+    if (commentId) {
+      // Elimina el comentario del array de comentarios del post
+      postUser.comments = postUser.comments.filter(
+        (comment) => comment._id.toString() !== commentId.toString()
+      );
+
+      // Guarda el post actualizado
+      await postUser.save();
+
+      // Elimina el comentario
+      await Comment.findByIdAndDelete(commentId);
     }
 
     // Elimina todos los retweets que hacen referencia al post específico
     await Retweet.deleteMany({ postIdDelete: postId });
 
     // Elimina el post
-
-    const postUser = await Post.findById(postId).populate("user");
 
     const updatedUserPostIds = postUser.user.posts.filter(
       (post) => post.toString() !== postId.toString()
