@@ -180,9 +180,7 @@ const deletePost = async (req, res) => {
       throw new Error("Invalid ID");
     }
 
-    const postUser = await Post.findById(postId)
-      .populate("user")
-
+    const postUser = await Post.findById(postId).populate("user");
 
     if (!postUser) {
       return res.status(404).json({ message: "Tweet not found" });
@@ -190,15 +188,12 @@ const deletePost = async (req, res) => {
 
     if (commentId) {
       // Elimina el comentario del array de comentarios del post
-      postUser.comments = postUser.comments.filter(
-        (comment) => comment._id.toString() !== commentId.toString()
-      );
-
-      // Guarda el post actualizado
-      await postUser.save();
+      await Post.findByIdAndUpdate(postId, {
+        $pull: { comments: commentId }, // Elimina el comentario del array de comentarios
+      });
 
       // Elimina el comentario
-      await Comment.findByIdAndDelete(commentId);
+      await Comment.deleteOne({ _id: commentId });
 
       return res.status(200).json({ message: "Comment Deleted" });
     }
