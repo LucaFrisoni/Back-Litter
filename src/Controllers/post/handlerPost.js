@@ -199,6 +199,8 @@ const deletePost = async (req, res) => {
 
       // Elimina el comentario
       await Comment.findByIdAndDelete(commentId);
+
+       return res.status(200).json({ message: "Comment Deleted" });
     }
 
     // Elimina todos los retweets que hacen referencia al post específico
