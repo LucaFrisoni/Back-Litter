@@ -155,7 +155,7 @@ const getPostId = async (req, res) => {
 
     const post = await Post.findById(postId)
       .populate("user")
-      .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
+      .populate({ path: "comments" });
 
     const quote = await Quote.findById(postId)
       .populate({ path: "postId", populate: { path: "user" } })
