@@ -182,7 +182,7 @@ const deletePost = async (req, res) => {
 
     const postUser = await Post.findById(postId)
       .populate("user")
-      .populate("comments");
+
 
     if (!postUser) {
       return res.status(404).json({ message: "Tweet not found" });
