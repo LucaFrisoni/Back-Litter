@@ -3,6 +3,7 @@ const User = require("../../Database/Models/User");
 const Retweet = require("../../Database/Models/Retweet");
 const Quote = require("../../Database/Models/Quote");
 const QuoteRetweet = require("../../Database/Models/QuoteRetweet");
+const Comment = require("../../Database/Models/Comments");
 
 const tweetPost = async (req, res) => {
   try {
@@ -181,13 +182,22 @@ const deletePost = async (req, res) => {
     }
 
     const postUser = await Post.findById(postId).populate("user");
-
-    if (!postUser) {
-      return res.status(404).json({ message: "Tweet not found" });
-    }
+    const quoteUser = await Quote.findById(postId);
 
     if (commentId) {
       // Elimina el comentario del array de comentarios del post
+
+      if (quoteUser) {
+        await Quote.findByIdAndUpdate(postId, {
+          $pull: { comments: commentId }, // Elimina el comentario del array de comentarios
+        });
+
+        // Elimina el comentario
+        await Comment.deleteOne({ _id: commentId });
+
+        return res.status(200).json({ message: "Comment Deleted" });
+      }
+
       await Post.findByIdAndUpdate(postId, {
         $pull: { comments: commentId }, // Elimina el comentario del array de comentarios
       });
