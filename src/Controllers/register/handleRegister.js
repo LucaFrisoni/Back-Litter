@@ -37,46 +37,19 @@ const userRegister = async (req, res) => {
 };
 const userRegisterTwitter = async (req, res) => {
   try {
-    const { email, username, name, password, image } = req.body;
+    const { username, name, image } = req.body;
 
     // Register de Twitter
-    if (image) {
-      const newUser = new User({
-        name,
-        image,
-        username,
-      });
-
-      await newUser.save();
-
-      return res.status(200).json(newUser);
-    }
-
-    // Hash de la contraseña
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email)) {
-      return res.status(400).json("Invalid email format");
-    }
-    const findEmail = await User.findOne({ email: email });
-    if (findEmail) {
-      return res.status(400).json("User Already Exist");
-    }
-    const findUsername = await User.findOne({ username: username });
-    if (findUsername) {
-      return res.status(400).json("Username Already Exist");
-    }
 
     const newUser = new User({
-      email,
-      username,
       name,
-      hashedPassword,
+      image,
+      username,
     });
 
     await newUser.save();
 
-    res.status(200).json(newUser);
+    return res.status(200).json(newUser);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Error creating user" });
