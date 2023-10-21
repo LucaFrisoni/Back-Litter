@@ -20,8 +20,6 @@ const userRegister = async (req, res) => {
       return res.status(400).json("Username Already Exist");
     }
 
-    
-
     const newUser = new User({
       email,
       username,
@@ -37,4 +35,24 @@ const userRegister = async (req, res) => {
     res.status(500).json({ error: "Error creating user" });
   }
 };
-module.exports = userRegister;
+const userRegisterTwitter = async (req, res) => {
+  try {
+    const { username, name, image } = req.body;
+
+    // Register de Twitter
+
+    const newUser = new User({
+      name,
+      image,
+      username,
+    });
+
+    await newUser.save();
+
+    return res.status(200).json(newUser);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Error creating user" });
+  }
+};
+module.exports = { userRegister, userRegisterTwitter };

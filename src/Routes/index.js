@@ -20,11 +20,15 @@ const {
   getPost,
   deletePost,
 } = require("../Controllers/post/handlerPost");
-const userRegister = require("../Controllers/register/handleRegister");
+const {
+  userRegister,
+  userRegisterTwitter,
+} = require("../Controllers/register/handleRegister");
 const {
   getUsers,
   getUserId,
   getUserEmail,
+  getUserUsername,
 } = require("../Controllers/users/handlerUsers");
 const handlerPasswordChange = require("../Controllers/password/handlerPasswordChange");
 const { getCharts } = require("../Controllers/charts/handlerCharts");
@@ -68,11 +72,13 @@ router.delete("/quotes", deleteQuote);
 router.get("/charts", getCharts);
 // Register
 router.post("/register", userRegister);
+router.post("/registerTwitter", userRegisterTwitter);
 // PasswordChange
 router.put("/passwordChange", handlerPasswordChange);
 //Users
 router.get("/users", getUsers);
 router.get("/users/:userId", getUserId);
 router.get("/email/:userEmail", getUserEmail);
+router.get("/username/:Username", getUserUsername);
 
 module.exports = router;

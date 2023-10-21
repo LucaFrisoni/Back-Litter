@@ -40,9 +40,26 @@ const getUserEmail = async (req, res) => {
     res.status(500).json({ error: "Error fetching user" });
   }
 };
+const getUserUsername = async (req, res) => {
+  const userUsername = req.params.Username;
+
+  try {
+    const user = await User.findOne({ username: userUsername }).populate(
+      "posts"
+    );
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching user" });
+  }
+};
 
 module.exports = {
   getUsers,
   getUserId,
   getUserEmail,
+  getUserUsername,
 };
