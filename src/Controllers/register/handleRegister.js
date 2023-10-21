@@ -43,7 +43,7 @@ const userRegisterTwitter = async (req, res) => {
 
     const newUser = new User({
       name,
-      image,
+      profileImage: image,
       username,
     });
 
