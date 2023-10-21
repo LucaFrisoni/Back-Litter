@@ -20,7 +20,10 @@ const {
   getPost,
   deletePost,
 } = require("../Controllers/post/handlerPost");
-const userRegister = require("../Controllers/register/handleRegister");
+const {
+  userRegister,
+  userRegisterTwitter,
+} = require("../Controllers/register/handleRegister");
 const {
   getUsers,
   getUserId,
@@ -68,6 +71,7 @@ router.delete("/quotes", deleteQuote);
 router.get("/charts", getCharts);
 // Register
 router.post("/register", userRegister);
+router.post("/registerTwitter", userRegisterTwitter);
 // PasswordChange
 router.put("/passwordChange", handlerPasswordChange);
 //Users
