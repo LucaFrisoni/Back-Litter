@@ -28,6 +28,7 @@ const {
   getUsers,
   getUserId,
   getUserEmail,
+  getUserUsername,
 } = require("../Controllers/users/handlerUsers");
 const handlerPasswordChange = require("../Controllers/password/handlerPasswordChange");
 const { getCharts } = require("../Controllers/charts/handlerCharts");
@@ -78,5 +79,6 @@ router.put("/passwordChange", handlerPasswordChange);
 router.get("/users", getUsers);
 router.get("/users/:userId", getUserId);
 router.get("/email/:userEmail", getUserEmail);
+router.get("/username/:Username", getUserUsername);
 
 module.exports = router;

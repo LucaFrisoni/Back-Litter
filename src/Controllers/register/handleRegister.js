@@ -42,9 +42,9 @@ const userRegisterTwitter = async (req, res) => {
     // Register de Twitter
     if (image) {
       const newUser = new User({
-        email,
         name,
         image,
+        username,
       });
 
       await newUser.save();
