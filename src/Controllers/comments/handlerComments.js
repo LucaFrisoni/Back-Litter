@@ -1,5 +1,4 @@
-const User = require("../../Database/Models/User");
-const Notification = require("../../Database/Models/Notifications");
+
 const Post = require("../../Database/Models/Post");
 const Comment = require("../../Database/Models/Comments");
 const Quote = require("../../Database/Models/Quote");

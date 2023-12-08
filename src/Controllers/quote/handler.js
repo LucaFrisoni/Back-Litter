@@ -1,5 +1,5 @@
 const Post = require("../../Database/Models/Post");
-const Retweet = require("../../Database/Models/Retweet");
+
 const Quote = require("../../Database/Models/Quote");
 const QuoteRetweet = require("../../Database/Models/QuoteRetweet");
 

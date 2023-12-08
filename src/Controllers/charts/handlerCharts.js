@@ -1,10 +1,8 @@
+const Quote = require("../../Database/Models/Quote");
 const User = require("../../Database/Models/User");
 const {
   startOfMonth,
-  startOfWeek,
-  endOfWeek,
   eachDayOfInterval,
-  eachWeekOfInterval,
   format,
   addDays,
 } = require("date-fns");
@@ -31,7 +29,11 @@ const getCharts = async (req, res) => {
   ];
   try {
     const user = await User.findById(userId).populate("posts");
-
+    const userQuotes = await Quote.find({ userQuote: userId });
+    console.log("userQuotes =>", userQuotes);
+    console.log("month =>", month);
+    console.log("mode =>", mode);
+    console.log("year =>", year);
     // Verificar si el mes seleccionado es posterior al mes actual
     const monthIndex = monthNames.findIndex((name) => name === month);
     if (monthIndex === -1) {
@@ -169,7 +171,7 @@ const getCharts = async (req, res) => {
         const weekEnd = new Date(week.end);
         const weekLikes = filteredLikes.filter((like) => {
           const likeDate = new Date(like.timestamp);
-   
+
           return likeDate >= weekStart && likeDate <= weekEnd;
         }).length;
         values.push(weekLikes);
