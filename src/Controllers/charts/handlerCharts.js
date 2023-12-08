@@ -30,10 +30,12 @@ const getCharts = async (req, res) => {
   try {
     const user = await User.findById(userId).populate("posts");
     const userQuotes = await Quote.find({ userQuote: userId });
-    console.log("userQuotes =>", userQuotes);
-    console.log("month =>", month);
-    console.log("mode =>", mode);
-    console.log("year =>", year);
+
+    let userPost = user.posts;
+    if (userQuotes) {
+      userPost = userPost.concat(userQuotes);
+    }
+
     // Verificar si el mes seleccionado es posterior al mes actual
     const monthIndex = monthNames.findIndex((name) => name === month);
     if (monthIndex === -1) {
@@ -54,7 +56,7 @@ const getCharts = async (req, res) => {
       endOfMonthDate = currentDate;
     }
 
-    const filteredLikes = user.posts.reduce((likes, post) => {
+    const filteredLikes = userPost.reduce((likes, post) => {
       likes.push(
         ...post.likeIds.filter((like) => {
           const likeDate = new Date(like.timestamp);
@@ -64,10 +66,6 @@ const getCharts = async (req, res) => {
       );
       return likes;
     }, []);
-
-    // console.log("Start", startOfMonthDate);
-    // console.log("End", endOfMonthDate);
-    // console.log("Likes Filtrados =>", filteredLikes);
 
     let labels = [];
     const values = [];
@@ -211,5 +209,52 @@ const getCharts = async (req, res) => {
     res.status(500).json(error);
   }
 };
+const totalLikes = async (req, res) => {
+  const { userId } = req.query;
+  try {
+    if (!userId) {
+      res.status(400).send("No User Id Provided");
+    }
 
-module.exports = { getCharts };
+    const user = await User.findById(userId).populate("posts");
+    const userQuotes = await Quote.find({ userQuote: userId });
+
+    let userPost = user.posts;
+    if (userQuotes) {
+      userPost = userPost.concat(userQuotes);
+    }
+
+    const totalLikes = userPost.reduce((likes, post) => {
+      likes += post.likeIds.length; // Agrega la cantidad de likes en cada post
+      return likes;
+    }, 0);
+
+
+    const currentDate = new Date();
+    const yesterdayDate = new Date(currentDate);
+    yesterdayDate.setDate(currentDate.getDate() - 1);
+
+
+    const likesToday = userPost.reduce((totalLikes, post) => {
+      totalLikes += post.likeIds.filter((like) => {
+        const likeDate = new Date(like.timestamp);
+        return likeDate.toDateString() === currentDate.toDateString();
+      }).length;
+      return totalLikes;
+    }, 0);
+
+    const likesYesterday = userPost.reduce((totalLikes, post) => {
+      totalLikes += post.likeIds.filter((like) => {
+        const likeDate = new Date(like.timestamp);
+        return likeDate.toDateString() === yesterdayDate.toDateString();
+      }).length;
+      return totalLikes;
+    }, 0);
+
+    return res.status(200).json({ totalLikes, likesToday, likesYesterday });
+  } catch (error) {
+    res.status(500).json("Internal Server Error " + error);
+  }
+};
+
+module.exports = { getCharts, totalLikes };

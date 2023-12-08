@@ -31,7 +31,7 @@ const {
   getUserUsername,
 } = require("../Controllers/users/handlerUsers");
 const handlerPasswordChange = require("../Controllers/password/handlerPasswordChange");
-const { getCharts } = require("../Controllers/charts/handlerCharts");
+const { getCharts ,totalLikes,totalLikesToday} = require("../Controllers/charts/handlerCharts");
 const {
   retweetPost,
   deleteRetweet,
@@ -70,6 +70,8 @@ router.post("/quotes", createQuote);
 router.delete("/quotes", deleteQuote);
 // chart
 router.get("/charts", getCharts);
+router.get("/chartsTL", totalLikes);
+
 // Register
 router.post("/register", userRegister);
 router.post("/registerTwitter", userRegisterTwitter);
