@@ -4,6 +4,10 @@ const Notification = require("../../Database/Models/Notifications")
   const userId = req.params.userId;
 
   try {
+    if (userId !== req.userId) {
+      return res.status(403).json({ error: "Not allowed" });
+    }
+
     const notifications = await Notification.find({ userId }).sort({
       createdAt: "desc",
     });

@@ -8,9 +8,9 @@ const { parseFeedOptions, getFeed } = require("./feedService");
 
 const tweetPost = async (req, res) => {
   try {
-    const { email, body } = req.body;
+    const { body } = req.body;
 
-    const user = await User.findOne({ email }); // Encuentra al usuario por su email
+    const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -86,6 +86,43 @@ const getPostId = async (req, res) => {
   }
 };
 
+const deleteComment = async (req, res, postId, commentId) => {
+  const comment = await Comment.findById(commentId).lean();
+  if (!comment) {
+    return res.status(404).json({ error: "Comment not found" });
+  }
+  if (String(comment.userId._id) !== req.userId) {
+    return res.status(403).json({ error: "Not allowed" });
+  }
+
+  // Elimina el comentario del array de comentarios del post o de la cita
+  const update = { $pull: { comments: commentId } };
+  await Promise.all([
+    Post.updateOne({ _id: postId }, update),
+    Quote.updateOne({ _id: postId }, update),
+  ]);
+  await Comment.deleteOne({ _id: commentId });
+
+  res.status(200).json({ message: "Comment Deleted" });
+};
+
+const deleteTweet = async (req, res, postId) => {
+  const post = await Post.findById(postId);
+  if (!post) {
+    return res.status(404).json({ message: "Tweet not found" });
+  }
+  if (String(post.userId) !== req.userId) {
+    return res.status(403).json({ error: "Not allowed" });
+  }
+
+  // Elimina todos los retweets que hacen referencia al post específico
+  await Retweet.deleteMany({ postIdDelete: postId });
+  await User.updateOne({ _id: post.userId }, { $pull: { posts: post._id } });
+  await Post.deleteOne({ _id: postId });
+
+  res.status(200).json({ message: "Tweet and its retweets deleted" });
+};
+
 const deletePost = async (req, res) => {
   const { postId, commentId } = req.query;
   try {
@@ -93,57 +130,10 @@ const deletePost = async (req, res) => {
       throw new Error("Invalid ID");
     }
 
-    const postUser = await Post.findById(postId).populate("user");
-    const quoteUser = await Quote.findById(postId);
-
     if (commentId) {
-      // Elimina el comentario del array de comentarios del post
-
-      if (quoteUser) {
-        await Quote.findByIdAndUpdate(postId, {
-          $pull: { comments: commentId }, // Elimina el comentario del array de comentarios
-        });
-
-        // Elimina el comentario
-        await Comment.deleteOne({ _id: commentId });
-
-        return res.status(200).json({ message: "Comment Deleted" });
-      }
-
-      await Post.findByIdAndUpdate(postId, {
-        $pull: { comments: commentId }, // Elimina el comentario del array de comentarios
-      });
-
-      // Elimina el comentario
-      await Comment.deleteOne({ _id: commentId });
-
-      return res.status(200).json({ message: "Comment Deleted" });
+      return await deleteComment(req, res, postId, commentId);
     }
-
-    // Elimina todos los retweets que hacen referencia al post específico
-    await Retweet.deleteMany({ postIdDelete: postId });
-
-    // Elimina el post
-
-    const updatedUserPostIds = postUser.user.posts.filter(
-      (post) => post.toString() !== postId.toString()
-    );
-
-    const updatedUser = await User.findByIdAndUpdate(
-      { _id: postUser.user._id },
-      { posts: updatedUserPostIds },
-      { new: true }
-    );
-
-    const result = await Post.deleteOne({ _id: postId });
-
-    if (result.deletedCount === 1) {
-      // El documento se eliminó exitosamente
-      res.status(200).json({ message: "Tweet and its retweets deleted" });
-    } else {
-      // No se encontró el documento con el ID proporcionado
-      res.status(404).json({ message: "Tweet not found" });
-    }
+    await deleteTweet(req, res, postId);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error deleting post" });

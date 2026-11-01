@@ -35,29 +35,21 @@ test("GET /users returns only public fields", async () => {
   assert.deepEqual(Object.keys(user).sort(), ["_id", "name", "username"]);
 });
 
-// UserBio sums likes from posts and matches the email to show the Edit button
+// UserBio sums likes from posts; emails and credentials must stay private
 test("GET /users/:id keeps what the profile needs, without the hash", async () => {
   const { user } = await seedUserWithPost();
   await User.create({ username: "bob", email: "b@t.io", followingIds: [user._id] });
   const { body } = await get(`/users/${user._id}`);
   assert.equal(body.followersCount, 1);
-  assert.equal(body.user.email, "ana@test.io");
+  assert.equal(body.user.username, "ana");
+  assert.equal(body.user.email, undefined);
   assert.equal(body.user.posts[0].likeIds.length, 1);
   assert.equal(body.user.hashedPassword, undefined);
 });
 
-// The feed no longer returns emails, but the login flow depends on this lookup
-test("GET /email/:email still provides what NextAuth verifies at login", async () => {
-  await seedUserWithPost();
-  const { body } = await get("/email/ana@test.io");
-  assert.equal(body.hashedPassword, "secret-hash");
-  assert.equal(body.email, "ana@test.io");
-});
-
-// Both lookups back the profile page and login error handling
+// The profile page relies on this to tell a missing user from a server error
 test("unknown users get a 404", async () => {
   assert.equal((await get("/users/64f000000000000000000000")).status, 404);
-  assert.equal((await get("/email/nobody@test.io")).status, 404);
 });
 
 // The tweet page renders comment authors, which used to embed the whole user

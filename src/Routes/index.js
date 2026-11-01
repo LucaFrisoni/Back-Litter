@@ -20,15 +20,12 @@ const {
   getPost,
   deletePost,
 } = require("../Controllers/post/handlerPost");
-const {
-  userRegister,
-  userRegisterTwitter,
-} = require("../Controllers/register/handleRegister");
+const { userRegister } = require("../Controllers/register/handleRegister");
+const login = require("../Controllers/login/handlerLogin");
 const {
   getUsers,
   getUserId,
-  getUserEmail,
-  getUserUsername,
+  getCurrentUser,
 } = require("../Controllers/users/handlerUsers");
 const handlerPasswordChange = require("../Controllers/password/handlerPasswordChange");
 const { getCharts ,totalLikes,totalLikesToday} = require("../Controllers/charts/handlerCharts");
@@ -39,48 +36,50 @@ const {
   deleteRetweetQuote,
 } = require("../Controllers/retweet/handler");
 const { createQuote, deleteQuote } = require("../Controllers/quote/handler");
+const { requireAuth } = require("../Middlewares/auth");
+const { credentialsLimiter } = require("../Middlewares/rateLimit");
 
 // Coments
-router.post("/comments", makeComment);
+router.post("/comments", requireAuth, makeComment);
 router.get("/comments", getComment);
 // Edit
-router.patch("/edit", editUser);
+router.patch("/edit", requireAuth, editUser);
 // Follow
-router.post("/follow", follow);
-router.delete("/follow", unfollow);
+router.post("/follow", requireAuth, follow);
+router.delete("/follow", requireAuth, unfollow);
 // Like
-router.post("/like", makeLike);
-router.delete("/like", deleteLike);
-router.post("/likeQuote", makeLikeQuote);
-router.delete("/likeQuote", deleteLikeQuote);
+router.post("/like", requireAuth, makeLike);
+router.delete("/like", requireAuth, deleteLike);
+router.post("/likeQuote", requireAuth, makeLikeQuote);
+router.delete("/likeQuote", requireAuth, deleteLikeQuote);
 // Notification
-router.get("/notifications/:userId", getNotifications);
+router.get("/notifications/:userId", requireAuth, getNotifications);
 // Posts
-router.post("/posts", tweetPost);
+router.post("/posts", requireAuth, tweetPost);
 router.get("/posts", getPost);
-router.delete("/delete/posts", deletePost);
+router.delete("/delete/posts", requireAuth, deletePost);
 router.get("/postss/:postId", getPostId);
 // Retweets
-router.post("/retweets", retweetPost);
-router.delete("/retweets", deleteRetweet);
-router.post("/retweetsQuotes", retweetQuote);
-router.delete("/retweetsQuotes", deleteRetweetQuote);
+router.post("/retweets", requireAuth, retweetPost);
+router.delete("/retweets", requireAuth, deleteRetweet);
+router.post("/retweetsQuotes", requireAuth, retweetQuote);
+router.delete("/retweetsQuotes", requireAuth, deleteRetweetQuote);
 // Quotes
-router.post("/quotes", createQuote);
-router.delete("/quotes", deleteQuote);
+router.post("/quotes", requireAuth, createQuote);
+router.delete("/quotes", requireAuth, deleteQuote);
 // chart
 router.get("/charts", getCharts);
 router.get("/chartsTL", totalLikes);
 
 // Register
-router.post("/register", userRegister);
-router.post("/registerTwitter", userRegisterTwitter);
+router.post("/register", credentialsLimiter, userRegister);
+// Login
+router.post("/login", credentialsLimiter, login);
 // PasswordChange
-router.put("/passwordChange", handlerPasswordChange);
+router.put("/passwordChange", credentialsLimiter, handlerPasswordChange);
 //Users
 router.get("/users", getUsers);
 router.get("/users/:userId", getUserId);
-router.get("/email/:userEmail", getUserEmail);
-router.get("/username/:Username", getUserUsername);
+router.get("/me", requireAuth, getCurrentUser);
 
 module.exports = router;

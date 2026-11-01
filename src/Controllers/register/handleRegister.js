@@ -5,8 +5,12 @@ const userRegister = async (req, res) => {
   try {
     const { email, username, name, password } = req.body;
 
-    // Hash de la contraseña
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const isValidBody = [email, username, name, password].every(
+      (field) => typeof field === "string" && field.length > 0
+    );
+    if (!isValidBody) {
+      return res.status(400).json("All fields are required");
+    }
 
     if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email)) {
       return res.status(400).json("Invalid email format");
@@ -20,6 +24,9 @@ const userRegister = async (req, res) => {
       return res.status(400).json("Username Already Exist");
     }
 
+    // Hash de la contraseña
+    const hashedPassword = await bcrypt.hash(password, 12);
+
     const newUser = new User({
       email,
       username,
@@ -29,30 +36,10 @@ const userRegister = async (req, res) => {
 
     await newUser.save();
 
-    res.status(200).json(newUser);
+    res.status(200).json({ _id: newUser._id, name, username, email });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Error creating user" });
   }
 };
-const userRegisterTwitter = async (req, res) => {
-  try {
-    const { username, name, image } = req.body;
-
-    // Register de Twitter
-
-    const newUser = new User({
-      name,
-      profileImage: image,
-      username,
-    });
-
-    await newUser.save();
-
-    return res.status(200).json(newUser);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Error creating user" });
-  }
-};
-module.exports = { userRegister, userRegisterTwitter };
+module.exports = { userRegister };

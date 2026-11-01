@@ -5,7 +5,7 @@ const Quote = require("../../Database/Models/Quote");
 
 const makeLike = async (req, res) => {
   try {
-    const { postId, currentUserId } = req.body;
+    const { postId } = req.body;
 
     const postLiked = await Post.findById(postId);
 
@@ -24,7 +24,7 @@ const makeLike = async (req, res) => {
 
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
-      { $push: { likeIds: { userId: currentUserId } } },
+      { $push: { likeIds: { userId: req.userId } } },
       { new: true }
     );
 
@@ -38,10 +38,9 @@ const makeLike = async (req, res) => {
 const deleteLike = async (req, res) => {
   try {
     const postId = req.query.postId;
-    const currentUserId = req.query.currentUserId;
 
-    if (!postId || !currentUserId) {
-      return res.status(400).json({ error: "Missing postId or currentUserId" });
+    if (!postId) {
+      return res.status(400).json({ error: "Missing postId" });
     }
 
     const postLiked = await Post.findById(postId);
@@ -51,7 +50,7 @@ const deleteLike = async (req, res) => {
     }
 
     const updatedLikeIds = postLiked.likeIds.filter(
-      (like) => like.userId.toString() !== currentUserId
+      (like) => like.userId.toString() !== req.userId
     );
 
     const updatedPost = await Post.findByIdAndUpdate(
@@ -70,7 +69,7 @@ const deleteLike = async (req, res) => {
 };
 const makeLikeQuote = async (req, res) => {
   try {
-    const { postId, currentUserId } = req.body;
+    const { postId } = req.body;
 
     const quoteLiked = await Quote.findById(postId);
 
@@ -80,7 +79,7 @@ const makeLikeQuote = async (req, res) => {
 
     const updatedQuote = await Quote.findByIdAndUpdate(
       postId,
-      { $push: { likeIds: { userId: currentUserId } } },
+      { $push: { likeIds: { userId: req.userId } } },
       { new: true }
     );
 
@@ -94,10 +93,9 @@ const makeLikeQuote = async (req, res) => {
 const deleteLikeQuote = async (req, res) => {
   try {
     const postId = req.query.postId;
-    const currentUserId = req.query.currentUserId;
 
-    if (!postId || !currentUserId) {
-      return res.status(400).json({ error: "Missing postId or currentUserId" });
+    if (!postId) {
+      return res.status(400).json({ error: "Missing postId" });
     }
 
     const quoteLiked = await Quote.findById(postId);
@@ -107,7 +105,7 @@ const deleteLikeQuote = async (req, res) => {
     }
 
     const updatedLikeIds = quoteLiked.likeIds.filter(
-      (like) => like.userId.toString() !== currentUserId
+      (like) => like.userId.toString() !== req.userId
     );
 
     const updatedQuote = await Quote.findByIdAndUpdate(

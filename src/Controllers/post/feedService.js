@@ -35,6 +35,7 @@ const USER_REFS = ["user", "userRetweet", "userQuote", "userQuoteRetweet"];
 const parseFeedOptions = ({ limit, before, beforeId, userId }) => {
   const parsedLimit = limit === undefined ? DEFAULT_LIMIT : Number(limit);
   if (!Number.isInteger(parsedLimit) || parsedLimit < 1) return null;
+  if (userId !== undefined && !mongoose.isValidObjectId(userId)) return null;
 
   const options = { limit: Math.min(parsedLimit, MAX_LIMIT), userId };
   if (before === undefined && beforeId === undefined) return options;

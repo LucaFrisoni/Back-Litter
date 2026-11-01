@@ -1,5 +1,9 @@
 const User = require("../../Database/Models/User");
-const { PUBLIC_USER_FIELDS } = require("../../Database/publicFields");
+const {
+  PUBLIC_USER_FIELDS,
+  PROFILE_FIELDS,
+  ACCOUNT_FIELDS,
+} = require("../../Database/publicFields");
 
 const MAX_USERS = 50;
 const POST_LIKES = { path: "posts", select: "likeIds.userId" };
@@ -21,7 +25,7 @@ const getUserId = async (req, res) => {
   try {
     const [user, followersCount] = await Promise.all([
       User.findById(userId)
-        .select("-hashedPassword")
+        .select(PROFILE_FIELDS)
         .populate(POST_LIKES)
         .lean(),
       User.count({ followingIds: userId }),
@@ -36,29 +40,9 @@ const getUserId = async (req, res) => {
   }
 };
 
-const getUserEmail = async (req, res) => {
-  const userEmail = req.params.userEmail;
-
+const getCurrentUser = async (req, res) => {
   try {
-    // El login de NextAuth compara la contrasena contra este hashedPassword
-    const user = await User.findOne({ email: userEmail }).lean();
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ error: "Error fetching user" });
-  }
-};
-const getUserUsername = async (req, res) => {
-  const userUsername = req.params.Username;
-
-  try {
-    const user = await User.findOne({ username: userUsername })
-      .select("-hashedPassword")
-      .populate("posts")
-      .lean();
+    const user = await User.findById(req.userId).select(ACCOUNT_FIELDS).lean();
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -72,6 +56,5 @@ const getUserUsername = async (req, res) => {
 module.exports = {
   getUsers,
   getUserId,
-  getUserEmail,
-  getUserUsername,
+  getCurrentUser,
 };

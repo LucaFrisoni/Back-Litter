@@ -4,7 +4,8 @@ const QuoteRetweet = require("../../Database/Models/QuoteRetweet");
 const Retweet = require("../../Database/Models/Retweet");
 
 const retweetPost = async (req, res) => {
-  const { postId, userRetweet } = req.body;
+  const { postId } = req.body;
+  const userRetweet = req.userId;
 
   try {
     if (!postId) {
@@ -34,7 +35,8 @@ const retweetPost = async (req, res) => {
 };
 
 const deleteRetweet = async (req, res) => {
-  const { postId, userRetweet } = req.query;
+  const { postId } = req.query;
+  const userRetweet = req.userId;
 
   try {
     if (!postId) {
@@ -75,7 +77,8 @@ const deleteRetweet = async (req, res) => {
 };
 
 const retweetQuote = async (req, res) => {
-  const { postId, userQuoteRetweet } = req.body;
+  const { postId } = req.body;
+  const userQuoteRetweet = req.userId;
 
   try {
     if (!postId) {
@@ -105,7 +108,8 @@ const retweetQuote = async (req, res) => {
 };
 
 const deleteRetweetQuote = async (req, res) => {
-  const { quoteId, userQuoteRetweet } = req.query;
+  const { quoteId } = req.query;
+  const userQuoteRetweet = req.userId;
 
   try {
     if (!quoteId) {

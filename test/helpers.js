@@ -1,4 +1,6 @@
 // Shared test setup: runs the real Express app against an in-memory MongoDB.
+process.env.JWT_SECRET = "test-secret";
+
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server-core");
 const app = require("../src/app");
@@ -26,7 +28,21 @@ const clearDb = () =>
 
 const get = async (path) => {
   const response = await fetch(baseUrl + path);
-  return { status: response.status, body: await response.json() };
+  return { status: response.status, body: await response.json().catch(() => null) };
+};
+
+const send = async (method, path, { token, data, headers = {} } = {}) => {
+  const response = await fetch(baseUrl + path, {
+    method,
+    headers: {
+      "content-type": "application/json",
+      ...(token && { authorization: `Bearer ${token}` }),
+      ...headers,
+    },
+    body: data && JSON.stringify(data),
+  });
+  const body = await response.json().catch(() => null);
+  return { status: response.status, body, headers: response.headers };
 };
 
 // Counts the MongoDB operations a request triggers
@@ -38,4 +54,4 @@ const countQueries = async (run) => {
   return queries;
 };
 
-module.exports = { startApp, stopApp, clearDb, get, countQueries };
+module.exports = { startApp, stopApp, clearDb, get, send, countQueries };

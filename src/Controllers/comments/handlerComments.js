@@ -5,12 +5,12 @@ const Quote = require("../../Database/Models/Quote");
 
 const makeComment = async (req, res) => {
   try {
-    const { currentUserId, body, postId } = req.body;
+    const { body, postId } = req.body;
 
     const newComment = new Comment({
       body,
       postId,
-      userId: currentUserId,
+      userId: req.userId,
     });
     let quoteCommented = null;
     const postCommented = await Post.findById(postId);
