@@ -17,6 +17,10 @@ const quoteSchema = new mongoose.Schema({
   retweets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Retweet" }],
 });
 
+// Sostienen el merge paginado del feed: general y por perfil
+quoteSchema.index({ createdAt: -1, _id: -1 });
+quoteSchema.index({ userQuote: 1, createdAt: -1, _id: -1 });
+
 const Quote = mongoose.model("Quote", quoteSchema);
 
 module.exports = Quote;

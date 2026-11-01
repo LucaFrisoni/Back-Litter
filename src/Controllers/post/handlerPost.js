@@ -2,8 +2,9 @@ const Post = require("../../Database/Models/Post");
 const User = require("../../Database/Models/User");
 const Retweet = require("../../Database/Models/Retweet");
 const Quote = require("../../Database/Models/Quote");
-const QuoteRetweet = require("../../Database/Models/QuoteRetweet");
 const Comment = require("../../Database/Models/Comments");
+const { PUBLIC_USER_FIELDS } = require("../../Database/publicFields");
+const { parseFeedOptions, getFeed } = require("./feedService");
 
 const tweetPost = async (req, res) => {
   try {
@@ -34,114 +35,17 @@ const tweetPost = async (req, res) => {
 
 const getPost = async (req, res) => {
   try {
-    const userId = req.query.userId;
-
-    if (userId) {
-      const user = await User.findById(userId);
-
-      if (user) {
-        const posts = await Post.find({ userId: userId })
-          .sort({
-            createdAt: "desc",
-          })
-          .populate("user")
-          .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
-
-        const retweets = await Retweet.find({ userRetweet: userId })
-          .sort({ createdAt: "desc" })
-          .populate({
-            path: "postId",
-            populate: { path: "user" }, // Popula el campo 'user' dentro del objeto 'postId'
-          })
-          .populate("userRetweet");
-
-        const quotes = await Quote.find({ userQuote: userId })
-          .sort({ createdAt: "desc" })
-          .populate({ path: "postId", populate: { path: "user" } })
-          .populate("userQuote");
-
-        const quoteretweets = await QuoteRetweet.find({
-          userQuoteRetweet: userId,
-        })
-          .sort({ createdAt: "desc" })
-          .populate({
-            path: "quoteId",
-            populate: [
-              {
-                path: "postId",
-                populate: { path: "user" },
-              },
-              { path: "userQuote" }, // Agregar este populate para userQuote en Quote
-            ],
-          })
-          .populate("userQuoteRetweet");
-
-        const combinedPostsAndRetweets = [
-          ...posts,
-          ...retweets,
-          ...quotes,
-          ...quoteretweets,
-        ];
-
-        // Ordena el array combinado en función del campo createdAt en orden descendente
-        combinedPostsAndRetweets.sort((a, b) => b.createdAt - a.createdAt);
-
-        if (combinedPostsAndRetweets.length === 0) {
-          res.status(200).json("No Posts available");
-        } else {
-          res.status(200).json(combinedPostsAndRetweets);
-        }
-      }
-    } else {
-      const posts = await Post.find()
-        .sort({ createdAt: "desc" })
-        .populate("user")
-        .populate({ path: "comments", options: { sort: { createdAt: -1 } } });
-
-      const retweets = await Retweet.find()
-        .sort({ createdAt: "desc" })
-        .populate({
-          path: "postId",
-          populate: { path: "user" }, // Popula el campo 'user' dentro del objeto 'postId'
-        })
-        .populate("userRetweet");
-
-      const quotes = await Quote.find()
-        .sort({ createdAt: "desc" })
-        .populate({ path: "postId", populate: { path: "user" } })
-        .populate("userQuote");
-
-      const quoteretweets = await QuoteRetweet.find()
-        .sort({ createdAt: "desc" })
-        .populate({
-          path: "quoteId",
-          populate: [
-            {
-              path: "postId",
-              populate: { path: "user" },
-            },
-            { path: "userQuote" }, // Agregar este populate para userQuote en Quote
-          ],
-        })
-        .populate("userQuoteRetweet");
-
-      // Combina los arrays de posts y retweets en uno solo
-      const combinedPostsAndRetweets = [
-        ...posts,
-        ...retweets,
-        ...quotes,
-        ...quoteretweets,
-      ];
-
-      // Ordena el array combinado en función del campo createdAt en orden descendente
-      combinedPostsAndRetweets.sort((a, b) => b.createdAt - a.createdAt);
-
-      if (combinedPostsAndRetweets.length === 0) {
-        res.status(200).json("No Posts available");
-      } else {
-        res.status(200).json(combinedPostsAndRetweets);
-      }
+    const options = parseFeedOptions(req.query);
+    if (!options) {
+      return res.status(400).json({ error: "Invalid pagination params" });
     }
+
+    const feed = await getFeed(options);
+
+    if (feed.length === 0 && !options.cursor) {
+      return res.status(200).json("No Posts available");
+    }
+    res.status(200).json(feed);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Error getting posts" });
@@ -156,14 +60,20 @@ const getPostId = async (req, res) => {
       throw new Error("Invalid ID");
     }
 
-    const post = await Post.findById(postId)
-      .populate("user")
-      .populate({ path: "comments" });
-
-    const quote = await Quote.findById(postId)
-      .populate({ path: "postId", populate: { path: "user" } })
-      .populate("userQuote")
-      .populate("comments");
+    const [post, quote] = await Promise.all([
+      Post.findById(postId)
+        .populate("user", PUBLIC_USER_FIELDS)
+        .populate({ path: "comments" })
+        .lean(),
+      Quote.findById(postId)
+        .populate({
+          path: "postId",
+          populate: { path: "user", select: PUBLIC_USER_FIELDS },
+        })
+        .populate("userQuote", PUBLIC_USER_FIELDS)
+        .populate("comments")
+        .lean(),
+    ]);
 
     if (!post && !quote) {
       return res.status(404).json({ error: "Post and Quote not found" });

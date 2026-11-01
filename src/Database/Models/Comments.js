@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { PUBLIC_USER_FIELDS } = require("../publicFields");
 
 const commentSchema = new mongoose.Schema({
   body: String,
@@ -12,7 +13,7 @@ const commentSchema = new mongoose.Schema({
 // 
 commentSchema.pre("find", function () {
   // this.populate("postId");
-  this.populate("userId");
+  this.populate("userId", PUBLIC_USER_FIELDS);
 });
 const Comment = mongoose.model("Comment", commentSchema);
 

@@ -1,0 +1,16 @@
+# Pings the API during active hours so Render's free plan does not put it to sleep (40s+ cold start).
+name: Keep API awake
+
+on:
+  schedule:
+    # 13:00-03:00 UTC (10:00-00:00 Argentina): 14h/day leaves margin in Render's 750 free hours
+    - cron: "*/10 13-23 * * *"
+    - cron: "*/10 0-2 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - run: curl --silent --show-error --fail --max-time 120 https://backlitter.onrender.com/ -o /dev/null

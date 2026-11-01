@@ -17,6 +17,10 @@ const retweetSchema = new mongoose.Schema({
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
 });
 
+// Sostienen el merge paginado del feed: general y por perfil
+retweetSchema.index({ createdAt: -1, _id: -1 });
+retweetSchema.index({ userRetweet: 1, createdAt: -1, _id: -1 });
+
 const Retweet = mongoose.model("Retweet", retweetSchema);
 
 module.exports = Retweet;

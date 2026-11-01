@@ -16,6 +16,10 @@ const postSchema = new mongoose.Schema({
   retweets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Retweet" }],
 });
 
+// Sostienen el merge paginado del feed: general y por perfil
+postSchema.index({ createdAt: -1, _id: -1 });
+postSchema.index({ userId: 1, createdAt: -1, _id: -1 });
+
 const Post = mongoose.model("Post", postSchema);
 
 module.exports = Post;
