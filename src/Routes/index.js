@@ -28,6 +28,7 @@ const {
   getCurrentUser,
 } = require("../Controllers/users/handlerUsers");
 const handlerPasswordChange = require("../Controllers/password/handlerPasswordChange");
+const getHealth = require("../Controllers/health/handlerHealth");
 const { getCharts ,totalLikes,totalLikesToday} = require("../Controllers/charts/handlerCharts");
 const {
   retweetPost,
@@ -39,6 +40,8 @@ const { createQuote, deleteQuote } = require("../Controllers/quote/handler");
 const { requireAuth } = require("../Middlewares/auth");
 const { credentialsLimiter } = require("../Middlewares/rateLimit");
 
+// Health
+router.get("/health", getHealth);
 // Coments
 router.post("/comments", requireAuth, makeComment);
 router.get("/comments", getComment);
